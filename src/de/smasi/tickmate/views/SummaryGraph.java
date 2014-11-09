@@ -33,6 +33,7 @@ public class SummaryGraph extends View {
 	private List<String> keys;
 	private Integer maximum;
 	private boolean cyclic;
+	private static int max_count = 7;
 	
 	public boolean isCyclic() {
 		return cyclic;

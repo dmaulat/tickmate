@@ -86,6 +86,12 @@ public class ShowTrackActivity extends Activity {
 	private void retrieveGraphData() {
 		Calendar today = Calendar.getInstance();
 		Locale locale = Locale.getDefault();
+
+		Calendar month = (Calendar) today.clone();
+		Calendar earliestTick = Calendar.getInstance();
+		earliestTick.set(Calendar.YEAR, 2014);
+		earliestTick.set(Calendar.MONTH, 1);
+		earliestTick.set(Calendar.DAY_OF_MONTH, 1);
 		
 		// Collect week days
 		this.weekdaysKeys = new LinkedList<String>();
@@ -110,12 +116,12 @@ public class ShowTrackActivity extends Activity {
 		Map<Integer, Integer> monthyear_to_index = new HashMap<Integer, Integer>(); 
 		this.monthsKeys = new LinkedList<String>();
 		this.monthsData = new LinkedList<Integer>();
-		Calendar month = (Calendar) today.clone();
+
 		month.clear(Calendar.HOUR);
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; earliestTick.compareTo(month) <= 0; i++) {
 			this.monthsKeys.add(0, month.getDisplayName(Calendar.MONTH, Calendar.SHORT, locale));
 			int index = month.get(Calendar.YEAR) + month.get(Calendar.MONTH) * 10000;
-			monthyear_to_index.put(index, 6-i);
+			monthyear_to_index.put(index, i);
 			month.add(Calendar.MONTH, -1);
 			this.monthsData.add(0, 0);			
 		}
@@ -125,11 +131,11 @@ public class ShowTrackActivity extends Activity {
 		this.weeksData = new LinkedList<Integer>();
 		Calendar week = (Calendar) today.clone();
 		week.clear(Calendar.HOUR);
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; earliestTick.compareTo(month) <= 0; i++) {
 			//month.getDisplayName(Calendar.WEEK_OF_YEAR, Calendar.SHORT, Locale.getDefault())
 			this.weeksKeys.add(0, Integer.toString(week.get(Calendar.WEEK_OF_YEAR)));
 			int index = week.get(Calendar.YEAR) + week.get(Calendar.WEEK_OF_YEAR) * 10000;
-			weekyear_to_index.put(index, 6-i);
+			weekyear_to_index.put(index, i);
 			week.add(Calendar.WEEK_OF_YEAR, -1);
 			this.weeksData.add(0, 0);			
 		}
@@ -147,19 +153,21 @@ public class ShowTrackActivity extends Activity {
 			int weekyear = tick.date.get(Calendar.YEAR) + tick.date.get(Calendar.WEEK_OF_YEAR) * 10000;
 			if (weekyear_to_index.containsKey(weekyear)) {
 				int index = weekyear_to_index.get(weekyear);
-				int newcount2 = this.weeksData.get(index)+1;
+				int real_index = this.weeksData.size() - index - 1;
+				int newcount2 = this.weeksData.get(real_index) + 1;
 				if (newcount2 > this.weeksMaximum)
 					this.weeksMaximum = newcount2;
-				this.weeksData.set(index, newcount2);
+				this.weeksData.set(real_index, newcount2);
 			}
 			
 			int monthyear = tick.date.get(Calendar.YEAR) + tick.date.get(Calendar.MONTH) * 10000;
 			if (monthyear_to_index.containsKey(monthyear)) {
 				int index = monthyear_to_index.get(monthyear);
-				int newcount2 = this.monthsData.get(index)+1;
+				int real_index = this.monthsData.size() - index - 1;
+				int newcount2 = this.monthsData.get(real_index) + 1;
 				if (newcount2 > this.monthsMaximum)
 					this.monthsMaximum = newcount2;
-				this.monthsData.set(index, newcount2);
+				this.monthsData.set(real_index, newcount2);
 			}
 
 			//tick.date.get(Calendar.YEAR) tick.date.get(Calendar.MONTH);
